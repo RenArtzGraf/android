@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriTrack</title>
+    
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          color: #333;
+          overflow-x: hidden;
+        }
+
+        .container {
+          max-width: 400px;
+          margin: 0 auto;
+          background: linear-gradient(145deg, #ffffff, #f8f9ff);
+          min-height: 100vh;
+          box-shadow: 0 0 30px rgba(103, 58, 183, 0.2);
+          position: relative;
+          padding-bottom: 80px;
+        }
+
+        .header {
+          background: linear-gradient(135deg, #9C27B0, #673AB7);
+          color: white;
+          padding: 25px 20px;
+          text-align: center;
+          box-shadow: 0 4px 20px rgba(156, 39, 176, 0.3);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .header::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+          animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .header h1 {
+          font-size: 28px;
+          font-weight: 700;
+          margin-bottom: 8px;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          position: relative;
+          z-index: 1;
+        }
+
+        .header p {
+          font-size: 14px;
+          opacity: 0.9;
+          position: relative;
+          z-index: 1;
+        }
+
+        .tabs {
+          position: fixed;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          max-width: 400px;
+          width: 100%;
+          display: flex;
+          background: linear-gradient(135deg, #9C27B0, #673AB7);
+          border-top: 1px solid rgba(255,255,255,0.2);
+          box-shadow: 0 -4px 20px rgba(156, 39, 176, 0.3);
+          z-index: 1000;
+        }
+
+        .tab-btn {
+          flex: 1;
+          padding: 12px 5px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          font-size: 11px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          color: rgba(255,255,255,0.7);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .tab-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #E91E63, #FF4081);
+          transform: scaleX(0);
+          transition: transform 0.3s ease;
+        }
+
+        .tab-btn.active::before {
+          transform: scaleX(1);
+        }
+
+        .tab-btn.active {
+          color: white;
+          font-weight: 600;
+          background: rgba(255,255,255,0.1);
+        }
+
+        .tab-btn:hover {
+          background: rgba(255,255,255,0.05);
+          transform: translateY(-2px);
+        }
+
+        .tab-content {
+          display: none;
+          padding: 25px 20px;
+          animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          background: linear-gradient(145deg, #fafafa, #ffffff);
+          border-radius: 20px 20px 0 0;
+          margin-top: 10px;
+          box-shadow: inset 0 1px 3px rgba(156, 39, 176, 0.1);
+        }
+
+        .tab-content.active {
+          display: block;
+        }
+
+        @keyframes slideIn {
+          from { 
+              opacity: 0; 
+              transform: translateY(30px) scale(0.95); 
+          }
+          to { 
+              opacity: 1; 
+              transform: translateY(0) scale(1); 
+          }
+        }
+
+        .form-group {
+          margin-bottom: 25px;
+          position: relative;
+        }
+
+        label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #673AB7;
+          font-size: 14px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        input, select {
+          width: 100%;
+          padding: 15px 20px;
+          border: 2px solid #E1BEE7;
+          border-radius: 15px;
+          font-size: 16px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          background: linear-gradient(145deg, #ffffff, #f8f9ff);
+          box-shadow: 0 4px 15px rgba(156, 39, 176, 0.1);
+        }
+
+        input:focus, select:focus {
+          outline: none;
+          border-color: #9C27B0;
+          box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.1), 0 8px 25px rgba(156, 39, 176, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .btn {
+          width: 100%;
+          padding: 18px;
+          background: linear-gradient(135deg, #9C27B0, #673AB7);
+          color: white;
+          border: none;
+          border-radius: 15px;
+          font-size: 16px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          margin-top: 15px;
+          box-shadow: 0 8px 25px rgba(156, 39, 176, 0.3);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+          left: 100%;
+        }
+
+        .btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 35px rgba(156, 39, 176, 0.4);
+        }
+
+        .btn:active {
+          transform: translateY(-1px);
+        }
+
+        .btn-clear {
+          background: linear-gradient(135deg, #E91E63, #F44336);
+          margin-top: 10px;
+          padding: 15px;
+          font-size: 14px;
+        }
+
+        .result-card {
+          background: linear-gradient(135deg, #F3E5F5, #E1BEE7);
+          padding: 25px;
+          border-radius: 20px;
+          margin-top: 25px;
+          border: 1px solid rgba(156, 39, 176, 0.2);
+          box-shadow: 0 10px 30px rgba(156, 39, 176, 0.15);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .result-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          background: linear-gradient(90deg, #9C27B0, #E91E63, #FF4081);
+        }
+
+        .result-card h3 {
+          color: #673AB7;
+          margin-bottom: 20px;
+          font-size: 20px;
+          text-align: center;
+        }
+
+        .result-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 0;
+          border-bottom: 1px solid rgba(156, 39, 176, 0.1);
+          transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+          background: rgba(156, 39, 176, 0.05);
+          margin: 0 -10px;
+          padding: 15px 10px;
+          border-radius: 10px;
+        }
+
+        .result-item:last-child {
+          border-bottom: none;
+        }
+
+        .result-label {
+          font-weight: 600;
+          color: #673AB7;
+          font-size: 14px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .result-value {
+          font-weight: 700;
+          color: #9C27B0;
+          font-size: 18px;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .schedule-card {
+          background: linear-gradient(145deg, #ffffff, #f8f9ff);
+          border-radius: 15px;
+          padding: 20px;
+          margin-bottom: 15px;
+          border-left: 4px solid #9C27B0;
+          box-shadow: 0 6px 20px rgba(156, 39, 176, 0.1);
+          transition: all 0.3s ease;
+        }
+
+        .schedule-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(156, 39, 176, 0.15);
+        }
+
+        .schedule-time {
+          font-weight: 700;
+          color: #9C27B0;
+          font-size: 18px;
+          margin-bottom: 5px;
+        }
+
+        .schedule-desc {
+          color: #673AB7;
+          margin-top: 5px;
+          font-size: 14px;
+        }
+
+        .progress-bar {
+          width: 100%;
+          height: 25px;
+          background: linear-gradient(145deg, #f0f0f0, #e8e8e8);
+          border-radius: 15px;
+          overflow: hidden;
+          margin: 15px 0;
+          box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #9C27B0, #E91E63, #FF4081);
+          transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+          border-radius: 15px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .progress-fill::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+          animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+          0% { left: -100%; }
+          100% { left: 100%; }
+        }
+
+        .water-tracker {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 15px;
+          margin-top: 25px;
+          padding: 20px;
+          background: linear-gradient(145deg, #f8f9ff, #ffffff);
+          border-radius: 20px;
+          box-shadow: 0 6px 20px rgba(156, 39, 176, 0.1);
+        }
+
+        .water-cup {
+          width: 65px;
+          height: 85px;
+          background: linear-gradient(145deg, #F3E5F5, #E1BEE7);
+          border: 3px solid #9C27B0;
+          border-radius: 0 0 35px 35px;
+          cursor: pointer;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 4px 15px rgba(156, 39, 176, 0.2);
+        }
+
+        .water-cup::before {
+          content: '💧';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 20px;
+          opacity: 0.3;
+          transition: all 0.3s ease;
+        }
+
+        .water-cup.filled {
+          background: linear-gradient(to top, #9C27B0 70%, #E1BEE7 70%);
+          border-color: #673AB7;
+          box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+        }
+
+        .water-cup.filled::before {
+          opacity: 0;
+        }
+
+        .water-cup:hover {
+          transform: scale(1.1) rotate(5deg);
+          box-shadow: 0 12px 35px rgba(156, 39, 176, 0.3);
+        }
+
+        .tips-card {
+          background: linear-gradient(135deg, #F3E5F5, #E1BEE7);
+          padding: 20px;
+          border-radius: 15px;
+          margin: 15px 0;
+          border: 1px solid rgba(156, 39, 176, 0.2);
+          box-shadow: 0 6px 20px rgba(156, 39, 176, 0.1);
+          transition: all 0.3s ease;
+        }
+
+        .tips-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 35px rgba(156, 39, 176, 0.15);
+        }
+
+        .tips-card h4 {
+          color: #673AB7;
+          margin-bottom: 12px;
+          font-size: 16px;
+        }
+
+        .tips-card p {
+          color: #673AB7;
+          line-height: 1.6;
+          margin-bottom: 8px;
+        }
+
+        .error {
+          color: #E91E63;
+          font-size: 14px;
+          margin-top: 8px;
+          font-weight: 500;
+        }
+
+        .success {
+          color: #9C27B0;
+          font-size: 14px;
+          margin-top: 8px;
+          font-weight: 500;
+        }
+
+        #waterGoal {
+          text-align: center;
+          margin-bottom: 20px;
+          padding: 20px;
+          background: linear-gradient(145deg, #ffffff, #f8f9ff);
+          border-radius: 15px;
+          box-shadow: 0 4px 15px rgba(156, 39, 176, 0.1);
+        }
+
+        #waterGoal p {
+          font-size: 16px;
+          color: #673AB7;
+          font-weight: 600;
+          margin-bottom: 10px;
+        }
+
+        .floating-elements {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: -1;
+        }
+
+        .floating-elements::before {
+          content: '✨';
+          position: absolute;
+          top: 20%;
+          left: 10%;
+          font-size: 20px;
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .floating-elements::after {
+          content: '💜';
+          position: absolute;
+          top: 70%;
+          right: 15%;
+          font-size: 16px;
+          animation: float 4s ease-in-out infinite reverse;
+        }
+
+        .streak-info {
+          background: linear-gradient(135deg, #4CAF50, #8BC34A);
+          color: white;
+          padding: 15px;
+          border-radius: 15px;
+          margin: 15px 0;
+          text-align: center;
+          box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .streak-info h4 {
+          margin-bottom: 5px;
+          font-size: 18px;
+        }
+
+        .data-info {
+          background: linear-gradient(135deg, #2196F3, #03A9F4);
+          color: white;
+          padding: 12px;
+          border-radius: 10px;
+          margin: 10px 0;
+          text-align: center;
+          font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="floating-elements"></div>
+        
+        <div class="header">
+            <h1>💜 NutriTrack</h1>
+            <p>Seu assistente pessoal para uma vida saudável</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('calculator')">
+                📊<br>Calc
+            </button>
+            <button class="tab-btn" onclick="showTab('nutrition')">
+                🍽️<br>Nutrição
+            </button>
+            <button class="tab-btn" onclick="showTab('water')">
+                💧<br>Água
+            </button>
+            <button class="tab-btn" onclick="showTab('schedule')">
+                ⏰<br>Horários
+            </button>
+            <button class="tab-btn" onclick="showTab('tips')">
+                💡<br>Dicas
+            </button>
+        </div>
+
+        <!-- Aba Calculadora -->
+        <div id="calculator" class="tab-content active">
+            <div class="form-group">
+                <label>Nome:</label>
+                <input type="text" id="name" placeholder="Seu nome">
+            </div>
+            
+            <div class="form-group">
+                <label>Idade:</label>
+                <input type="number" id="age" placeholder="Ex: 25">
+            </div>
+            
+            <div class="form-group">
+                <label>Sexo:</label>
+                <select id="gender">
+                    <option value="">Selecione</option>
+                    <option value="male">Masculino</option>
+                    <option value="female">Feminino</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Altura (cm):</label>
+                <input type="number" id="height" placeholder="Ex: 170">
+            </div>
+            
+            <div class="form-group">
+                <label>Peso atual (kg):</label>
+                <input type="number" id="weight" placeholder="Ex: 70">
+            </div>
+            
+            <div class="form-group">
+                <label>Nível de atividade:</label>
+                <select id="activity">
+                    <option value="">Selecione</option>
+                    <option value="1.2">Sedentário (pouco ou nenhum exercício)</option>
+                    <option value="1.375">Levemente ativo (exercício leve 1-3 dias/semana)</option>
+                    <option value="1.55">Moderadamente ativo (exercício moderado 3-5 dias/semana)</option>
+                    <option value="1.725">Muito ativo (exercício pesado 6-7 dias/semana)</option>
+                    <option value="1.9">Extremamente ativo (exercício muito pesado, físico)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Objetivo:</label>
+                <select id="goal">
+                    <option value="">Selecione</option>
+                    <option value="lose">Perder peso</option>
+                    <option value="maintain">Manter peso</option>
+                    <option value="gain">Ganhar peso</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="calculate()">Calcular</button>
+            <button class="btn btn-clear" onclick="clearData()">Limpar Dados</button>
+            
+            <div id="results"></div>
+            <div id="dataInfo" class="data-info" style="display: none;"></div>
+        </div>
+
+        <!-- Aba Nutrição -->
+        <div id="nutrition" class="tab-content">
+            <div id="nutritionContent">
+                <p style="text-align: center; color: #666;">Preencha o formulário na aba "Calc" primeiro</p>
+            </div>
+        </div>
+
+        <!-- Aba Água -->
+        <div id="water" class="tab-content">
+            <h3>💧 Controle de Água Diário</h3>
+            <div id="streakInfo" class="streak-info" style="display: none;">
+                <h4>🔥 Sequência de Dias</h4>
+                <p id="streakDays">0 dias consecutivos atingindo a meta!</p>
+            </div>
+            
+            <div id="waterGoal">
+                <p>Meta diária: <span id="dailyWaterGoal">0</span>L</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="waterProgress" style="width: 0%"></div>
+                </div>
+                <p>Consumido: <span id="waterConsumed">0</span>L / <span id="waterTotal">0</span>L</p>
+            </div>
+            
+            <div class="water-tracker" id="waterCups"></div>
+            
+            <button class="btn" onclick="resetWaterTracker()">Resetar Dia</button>
+        </div>
+
+        <!-- Aba Horários -->
+        <div id="schedule" class="tab-content">
+            <div id="scheduleContent">
+                <p style="text-align: center; color: #666;">Preencha o formulário na aba "Calc" primeiro</p>
+            </div>
+        </div>
+
+        <!-- Aba Dicas -->
+        <div id="tips" class="tab-content">
+            <div class="tips-card">
+                <h4>🥗 Dicas de Alimentação</h4>
+                <p>• Coma de 3 em 3 horas para manter o metabolismo ativo</p>
+                <p>• Inclua proteínas em todas as refeições</p>
+                <p>• Consuma pelo menos 5 porções de frutas e vegetais por dia</p>
+            </div>
+            
+            <div class="tips-card">
+                <h4>💧 Dicas de Hidratação</h4>
+                <p>• Beba água ao acordar para ativar o metabolismo</p>
+                <p>• Mantenha uma garrafa de água sempre por perto</p>
+                <p>• Adicione limão ou hortelã para variar o sabor</p>
+            </div>
+            
+            <div class="tips-card">
+                <h4>🏃‍♂️ Dicas de Exercício</h4>
+                <p>• Comece com 30 minutos de caminhada diária</p>
+                <p>• Inclua exercícios de força 2-3 vezes por semana</p>
+                <p>• Alongue-se antes e depois dos exercícios</p>
+            </div>
+            
+            <div class="tips-card">
+                <h4>😴 Dicas de Sono</h4>
+                <p>• Durma 7-9 horas por noite</p>
+                <p>• Evite telas 1 hora antes de dormir</p>
+                <p>• Mantenha o quarto escuro e fresco</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let userData = {};
+        let waterConsumed = 0;
+        let waterGoal = 0;
+        let waterStreak = 0;
+
+        // Funções de armazenamento local
+        function saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (error) {
+                console.error('Erro ao salvar dados:', error);
+            }
+        }
+
+        function loadFromStorage(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                return null;
+            }
+        }
+
+        function removeFromStorage(key) {
+            try {
+                localStorage.removeItem(key);
+            } catch (error) {
+                console.error('Erro ao remover dados:', error);
+            }
+        }
+
+        // Função para obter data atual no formato YYYY-MM-DD
+        function getCurrentDate() {
+            const now = new Date();
+            return now.getFullYear() + '-' + 
+                   String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(now.getDate()).padStart(2, '0');
+        }
+
+        // Carregar dados salvos na inicialização
+        function loadSavedData() {
+            // Carregar dados do usuário
+            const savedUserData = loadFromStorage('nutritrack_user_data');
+            if (savedUserData) {
+                userData = savedUserData;
+                
+                // Preencher formulário
+                document.getElementById('name').value = userData.name || '';
+                document.getElementById('age').value = userData.age || '';
+                document.getElementById('gender').value = userData.gender || '';
+                document.getElementById('height').value = userData.height || '';
+                document.getElementById('weight').value = userData.weight || '';
+                document.getElementById('activity').value = userData.activity || '';
+                document.getElementById('goal').value = userData.goal || '';
+
+                // Se há dados salvos, recalcular automaticamente
+                if (userData.name && userData.age && userData.gender && userData.height && userData.weight && userData.activity && userData.goal) {
+                    calculate();
+                    showDataInfo();
+                }
+            }
+
+            // Carregar dados de água do dia atual
+            loadTodayWaterData();
+            
+            // Carregar streak de água
+            const savedStreak = loadFromStorage('nutritrack_water_streak');
+            if (savedStreak) {
+                waterStreak = savedStreak;
+                updateStreakDisplay();
+            }
+        }
+
+        // Carregar dados de água do dia atual
+        function loadTodayWaterData() {
+            const today = getCurrentDate();
+            const todayWaterData = loadFromStorage(`nutritrack_water_${today}`);
+            
+            if (todayWaterData) {
+                waterConsumed = todayWaterData.consumed || 0;
+                waterGoal = todayWaterData.goal || 0;
+                
+                // Restaurar estado dos copos
+                if (todayWaterData.filledCups && Array.isArray(todayWaterData.filledCups)) {
+                    setTimeout(() => {
+                        todayWaterData.filledCups.forEach(index => {
+                            const cup = document.getElementById(`cup-${index}`);
+                            if (cup) {
+                                cup.classList.add('filled');
+                            }
+                        });
+                        updateWaterProgress();
+                    }, 100);
+                }
+            }
+        }
+
+        // Salvar dados de água do dia atual
+        function saveTodayWaterData() {
+            const today = getCurrentDate();
+            const filledCups = [];
+            
+            document.querySelectorAll('.water-cup.filled').forEach((cup, index) => {
+                const cupId = cup.id.replace('cup-', '');
+                filledCups.push(parseInt(cupId));
+            });
+
+            const waterData = {
+                consumed: waterConsumed,
+                goal: waterGoal,
+                filledCups: filledCups,
+                date: today
+            };
+
+            saveToStorage(`nutritrack_water_${today}`, waterData);
+        }
+
+        // Mostrar informações sobre dados salvos
+        function showDataInfo() {
+            const savedData = loadFromStorage('nutritrack_user_data');
+            if (savedData && savedData.lastUpdated) {
+                const lastUpdate = new Date(savedData.lastUpdated);
+                const now = new Date();
+                const diffInHours = Math.floor((now - lastUpdate) / (1000 * 60 * 60));
+                
+                let timeText = '';
+                if (diffInHours < 1) {
+                    timeText = 'há poucos minutos';
+                } else if (diffInHours < 24) {
+                    timeText = `há ${diffInHours} hora${diffInHours > 1 ? 's' : ''}`;
+                } else {
+                    const diffInDays = Math.floor(diffInHours / 24);
+                    timeText = `há ${diffInDays} dia${diffInDays > 1 ? 's' : ''}`;
+                }
+                
+                document.getElementById('dataInfo').innerHTML = `📅 Dados salvos ${timeText}`;
+                document.getElementById('dataInfo').style.display = 'block';
+            }
+        }
+
+       // Atualizar streak de água
+        function updateWaterStreak() {
+            const today = getCurrentDate();
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.getFullYear() + '-' + 
+                               String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + 
+                               String(yesterday.getDate()).padStart(2, '0');
+
+            const todayWaterData = loadFromStorage(`nutritrack_water_${today}`);
+            const yesterdayWaterData = loadFromStorage(`nutritrack_water_${yesterdayStr}`);
+
+            // Verificar se a meta de hoje foi atingida
+            const todayGoalReached = todayWaterData && todayWaterData.consumed >= todayWaterData.goal;
+            
+            // Verificar se a meta de ontem foi atingida
+            const yesterdayGoalReached = yesterdayWaterData && yesterdayWaterData.consumed >= yesterdayWaterData.goal;
+
+            if (todayGoalReached) {
+                if (yesterdayGoalReached) {
+                    // Continuar streak
+                    waterStreak += 1;
+                } else {
+                    // Começar novo streak
+                    waterStreak = 1;
+                }
+            } else {
+                // Meta não atingida hoje, resetar streak
+                waterStreak = 0;
+            }
+
+            saveToStorage('nutritrack_water_streak', waterStreak);
+            updateStreakDisplay();
+        }
+
+        // Mostrar informações do streak
+        function updateStreakDisplay() {
+            const streakInfo = document.getElementById('streakInfo');
+            const streakDays = document.getElementById('streakDays');
+
+            if (waterStreak > 0) {
+                streakInfo.style.display = 'block';
+                streakDays.textContent = `${waterStreak} dia${waterStreak > 1 ? 's' : ''} consecutivo${waterStreak > 1 ? 's' : ''} atingindo a meta!`;
+            } else {
+                streakInfo.style.display = 'none';
+            }
+        }
+
+        // Função para trocar abas
+        function showTab(tabName) {
+            // Esconder todas as abas
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remover classe active de todos os botões
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Mostrar aba selecionada
+            document.getElementById(tabName).classList.add('active');
+
+            // Adicionar classe active ao botão clicado
+            event.target.classList.add('active');
+
+            // Se for a aba de água, atualizar display
+            if (tabName === 'water') {
+                updateWaterProgress();
+            }
+        }
+
+        // Função principal de cálculo
+        function calculate() {
+            // Coletar dados do formulário
+            const name = document.getElementById('name').value;
+            const age = parseFloat(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const goal = document.getElementById('goal').value;
+
+            // Validar dados
+            if (!name || !age || !gender || !height || !weight || !activity || !goal) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+
+            // Salvar dados do usuário
+            userData = {
+                name, age, gender, height, weight, activity, goal,
+                lastUpdated: new Date().toISOString()
+            };
+            saveToStorage('nutritrack_user_data', userData);
+
+            // Calcular TMB (Taxa Metabólica Basal)
+            let tmb;
+            if (gender === 'male') {
+                tmb = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+            } else {
+                tmb = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+
+            // Calcular GET (Gasto Energético Total)
+            const get = tmb * activity;
+
+            // Ajustar calorias baseado no objetivo
+            let targetCalories;
+            switch (goal) {
+                case 'lose':
+                    targetCalories = get - 500; // Déficit de 500 calorias
+                    break;
+                case 'gain':
+                    targetCalories = get + 500; // Superávit de 500 calorias
+                    break;
+                default:
+                    targetCalories = get; // Manutenção
+            }
+
+            // Calcular macronutrientes
+            const protein = weight * 2; // 2g por kg
+            const fat = targetCalories * 0.25 / 9; // 25% das calorias
+            const carbs = (targetCalories - (protein * 4) - (fat * 9)) / 4;
+
+            // Calcular IMC
+            const bmi = weight / ((height / 100) ** 2);
+
+            // Classificar IMC
+            let bmiCategory;
+            if (bmi < 18.5) bmiCategory = 'Abaixo do peso';
+            else if (bmi < 25) bmiCategory = 'Peso normal';
+            else if (bmi < 30) bmiCategory = 'Sobrepeso';
+            else bmiCategory = 'Obesidade';
+
+            // Calcular meta de água
+            waterGoal = (weight * 35) / 1000; // 35ml por kg
+
+            // Exibir resultados
+            displayResults(tmb, get, targetCalories, protein, fat, carbs, bmi, bmiCategory);
+            
+            // Atualizar outras seções
+            updateNutritionTab(targetCalories, protein, fat, carbs);
+            updateScheduleTab();
+            setupWaterTracker();
+            
+            // Mostrar info dos dados salvos
+            showDataInfo();
+        }
+
+        // Exibir resultados dos cálculos
+        function displayResults(tmb, get, targetCalories, protein, fat, carbs, bmi, bmiCategory) {
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = `
+                <div class="result-card">
+                    <h3>🎯 Seus Resultados, ${userData.name}!</h3>
+                    
+                    <div class="result-item">
+                        <span class="result-label">IMC</span>
+                        <span class="result-value">${bmi.toFixed(1)}</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Classificação</span>
+                        <span class="result-value">${bmiCategory}</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">TMB</span>
+                        <span class="result-value">${Math.round(tmb)} kcal</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">GET</span>
+                        <span class="result-value">${Math.round(get)} kcal</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Calorias Meta</span>
+                        <span class="result-value">${Math.round(targetCalories)} kcal</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Proteínas</span>
+                        <span class="result-value">${Math.round(protein)}g</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Carboidratos</span>
+                        <span class="result-value">${Math.round(carbs)}g</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Gorduras</span>
+                        <span class="result-value">${Math.round(fat)}g</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Água Diária</span>
+                        <span class="result-value">${waterGoal.toFixed(1)}L</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Atualizar aba de nutrição
+        function updateNutritionTab(calories, protein, fat, carbs) {
+            const nutritionContent = document.getElementById('nutritionContent');
+            
+            nutritionContent.innerHTML = `
+                <h3>🍽️ Plano Nutricional</h3>
+                
+                <div class="result-card">
+                    <h4>📊 Distribuição de Macronutrientes</h4>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Proteínas (30%)</span>
+                        <span class="result-value">${Math.round(protein)}g</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Carboidratos (45%)</span>
+                        <span class="result-value">${Math.round(carbs)}g</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Gorduras (25%)</span>
+                        <span class="result-value">${Math.round(fat)}g</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Total de Calorias</span>
+                        <span class="result-value">${Math.round(calories)} kcal</span>
+                    </div>
+                </div>
+                
+                <div class="tips-card">
+                    <h4>🥗 Sugestões de Alimentos</h4>
+                    <p><strong>Proteínas:</strong> Frango, peixe, ovos, leguminosas, tofu</p>
+                    <p><strong>Carboidratos:</strong> Arroz integral, batata doce, aveia, frutas</p>
+                    <p><strong>Gorduras:</strong> Abacate, oleaginosas, azeite, peixes gordos</p>
+                </div>
+                
+                <div class="tips-card">
+                    <h4>⏰ Distribuição das Refeições</h4>
+                    <p><strong>Café da manhã:</strong> ${Math.round(calories * 0.25)} kcal</p>
+                    <p><strong>Almoço:</strong> ${Math.round(calories * 0.30)} kcal</p>
+                    <p><strong>Lanche:</strong> ${Math.round(calories * 0.15)} kcal</p>
+                    <p><strong>Jantar:</strong> ${Math.round(calories * 0.30)} kcal</p>
+                </div>
+            `;
+        }
+
+        // Atualizar aba de horários
+        function updateScheduleTab() {
+            const scheduleContent = document.getElementById('scheduleContent');
+            
+            scheduleContent.innerHTML = `
+                <h3>⏰ Cronograma Personalizado</h3>
+                
+                <div class="schedule-card">
+                    <div class="schedule-time">07:00</div>
+                    <strong>☀️ Café da Manhã</strong>
+                    <div class="schedule-desc">Hidrate-se e consuma proteínas para começar o dia</div>
+                </div>
+                
+                <div class="schedule-card">
+                    <div class="schedule-time">10:00</div>
+                    <strong>🥤 Lanche da Manhã</strong>
+                    <div class="schedule-desc">Fruta ou oleaginosas + água</div>
+                </div>
+                
+                <div class="schedule-card">
+                    <div class="schedule-time">12:30</div>
+                    <strong>🍽️ Almoço</strong>
+                    <div class="schedule-desc">Refeição completa com todos os macronutrientes</div>
+                </div>
+                
+                <div class="schedule-card">
+                    <div class="schedule-time">15:30</div>
+                    <strong>🍎 Lanche da Tarde</strong>
+                    <div class="schedule-desc">Lanche leve + hidratação</div>
+                </div>
+                
+                <div class="schedule-card">
+                    <div class="schedule-time">19:00</div>
+                    <strong>🌙 Jantar</strong>
+                    <div class="schedule-desc">Refeição mais leve, evite carboidratos refinados</div>
+                </div>
+                
+                <div class="schedule-card">
+                    <div class="schedule-time">21:30</div>
+                    <strong>😴 Preparação para Dormir</strong>
+                    <div class="schedule-desc">Evite telas, faça alongamento ou meditação</div>
+                </div>
+            `;
+        }
+
+        // Configurar controle de água
+        function setupWaterTracker() {
+            const waterCupsDiv = document.getElementById('waterCups');
+            const cupsNeeded = Math.ceil(waterGoal / 0.25); // 250ml por copo
+            
+            waterCupsDiv.innerHTML = '';
+            
+            for (let i = 0; i < cupsNeeded; i++) {
+                const cup = document.createElement('div');
+                cup.className = 'water-cup';
+                cup.id = `cup-${i}`;
+                cup.onclick = () => toggleWaterCup(i);
+                waterCupsDiv.appendChild(cup);
+            }
+            
+            updateWaterDisplay();
+            updateWaterProgress();
+            
+            // Carregar estado dos copos salvos
+            loadTodayWaterData();
+        }
+
+        // Alternar estado do copo de água
+        function toggleWaterCup(index) {
+            const cup = document.getElementById(`cup-${index}`);
+            const wasFilled = cup.classList.contains('filled');
+            
+            if (wasFilled) {
+                cup.classList.remove('filled');
+                waterConsumed = Math.max(0, waterConsumed - 0.25);
+            } else {
+                cup.classList.add('filled');
+                waterConsumed += 0.25;
+            }
+            
+            updateWaterProgress();
+            saveTodayWaterData();
+            
+            // Verificar se atingiu a meta
+            if (waterConsumed >= waterGoal) {
+                updateWaterStreak();
+            }
+        }
+
+        // Atualizar exibição da água
+        function updateWaterDisplay() {
+            document.getElementById('dailyWaterGoal').textContent = waterGoal.toFixed(1);
+            document.getElementById('waterTotal').textContent = waterGoal.toFixed(1);
+        }
+
+        // Atualizar progresso da água
+        function updateWaterProgress() {
+            const progress = Math.min((waterConsumed / waterGoal) * 100, 100);
+            document.getElementById('waterProgress').style.width = progress + '%';
+            document.getElementById('waterConsumed').textContent = waterConsumed.toFixed(1);
+        }
+
+        // Resetar controle de água
+        function resetWaterTracker() {
+            if (confirm('Tem certeza que deseja resetar o controle de água do dia?')) {
+                waterConsumed = 0;
+                
+                // Remover classe filled de todos os copos
+                document.querySelectorAll('.water-cup').forEach(cup => {
+                    cup.classList.remove('filled');
+                });
+                
+                updateWaterProgress();
+                
+                // Remover dados salvos do dia atual
+                const today = getCurrentDate();
+                removeFromStorage(`nutritrack_water_${today}`);
+            }
+        }
+
+        // Limpar todos os dados
+        function clearData() {
+            if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
+                // Limpar formulário
+                document.getElementById('name').value = '';
+                document.getElementById('age').value = '';
+                document.getElementById('gender').value = '';
+                document.getElementById('height').value = '';
+                document.getElementById('weight').value = '';
+                document.getElementById('activity').value = '';
+                document.getElementById('goal').value = '';
+                
+                // Limpar resultados
+                document.getElementById('results').innerHTML = '';
+                document.getElementById('dataInfo').style.display = 'none';
+                
+                // Resetar conteúdo das abas
+                document.getElementById('nutritionContent').innerHTML = '<p style="text-align: center; color: #666;">Preencha o formulário na aba "Calc" primeiro</p>';
+                document.getElementById('scheduleContent').innerHTML = '<p style="text-align: center; color: #666;">Preencha o formulário na aba "Calc" primeiro</p>';
+                
+                // Limpar dados salvos
+                removeFromStorage('nutritrack_user_data');
+                removeFromStorage('nutritrack_water_streak');
+                
+                // Limpar todos os dados de água salvos (últimos 30 dias)
+                const today = new Date();
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.getFullYear() + '-' + 
+                                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                                   String(date.getDate()).padStart(2, '0');
+                    removeFromStorage(`nutritrack_water_${dateStr}`);
+                }
+                
+                // Resetar variáveis
+                userData = {};
+                waterConsumed = 0;
+                waterGoal = 0;
+                waterStreak = 0;
+                
+                // Limpar display de água
+                document.getElementById('waterCups').innerHTML = '';
+                document.getElementById('dailyWaterGoal').textContent = '0';
+                document.getElementById('waterConsumed').textContent = '0';
+                document.getElementById('waterTotal').textContent = '0';
+                document.getElementById('waterProgress').style.width = '0%';
+                document.getElementById('streakInfo').style.display = 'none';
+                
+                alert('Todos os dados foram limpos com sucesso!');
+            }
+        }
+
+        // Inicializar aplicação
+        window.addEventListener('load', function() {
+            loadSavedData();
+            
+            // Configurar event listeners para salvar dados automaticamente
+            const inputs = ['name', 'age', 'gender', 'height', 'weight', 'activity', 'goal'];
+            inputs.forEach(inputId => {
+                const element = document.getElementById(inputId);
+                if (element) {
+                    element.addEventListener('change', function() {
+                        // Salvar dados automaticamente quando houver mudanças
+                        const currentData = {
+                            name: document.getElementById('name').value,
+                            age: document.getElementById('age').value,
+                            gender: document.getElementById('gender').value,
+                            height: document.getElementById('height').value,
+                            weight: document.getElementById('weight').value,
+                            activity: document.getElementById('activity').value,
+                            goal: document.getElementById('goal').value,
+                            lastUpdated: new Date().toISOString()
+                        };
+                        
+                        // Só salva se pelo menos nome estiver preenchido
+                        if (currentData.name) {
+                            saveToStorage('nutritrack_user_data', currentData);
+                        }
+                    });
+                }
+            });
+        });
+
+        // Função para verificar e limpar dados antigos (executar semanalmente)
+        function cleanOldData() {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            // Limpar dados de água mais antigos que 30 dias
+            for (let i = 30; i < 60; i++) {
+                const oldDate = new Date();
+                oldDate.setDate(oldDate.getDate() - i);
+                const dateStr = oldDate.getFullYear() + '-' + 
+                               String(oldDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                               String(oldDate.getDate()).padStart(2, '0');
+                removeFromStorage(`nutritrack_water_${dateStr}`);
+            }
+        }
+
+        // Executar limpeza de dados antigos na inicialização (uma vez por semana)
+        const lastCleanup = loadFromStorage('nutritrack_last_cleanup');
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        if (!lastCleanup || new Date(lastCleanup) < oneWeekAgo) {
+            cleanOldData();
+            saveToStorage('nutritrack_last_cleanup', now.toISOString());
+        }
+		
+		</script>
+		</body>
+</html>
