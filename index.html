@@ -555,7 +555,6 @@
             </button>
         </div>
 
-        <!-- Aba Calculadora -->
         <div id="calculator" class="tab-content active">
             <div class="form-group">
                 <label>Nome:</label>
@@ -622,7 +621,6 @@
             </div>
         </div>
 
-        <!-- Aba Água -->
         <div id="water" class="tab-content">
             <h3>💧 Controle de Água Diário</h3>
             <div id="streakInfo" class="streak-info" style="display: none;">
@@ -643,14 +641,12 @@
             <button class="btn" onclick="resetWaterTracker()">Resetar Dia</button>
         </div>
 
-        <!-- Aba Horários -->
         <div id="schedule" class="tab-content">
             <div id="scheduleContent">
                 <p style="text-align: center; color: #666;">Preencha o formulário na aba "Calc" primeiro</p>
             </div>
         </div>
 
-        <!-- Aba Dicas -->
         <div id="tips" class="tab-content">
             <div class="tips-card">
                 <h4>🥗 Dicas de Alimentação</h4>
@@ -683,13 +679,11 @@
     </div>
 
     <script>
-        // Variáveis globais
         let userData = {};
         let waterConsumed = 0;
         let waterGoal = 0;
         let waterStreak = 0;
 
-        // Funções de armazenamento local
         function saveToStorage(key, data) {
             try {
                 localStorage.setItem(key, JSON.stringify(data));
@@ -716,7 +710,6 @@
             }
         }
 
-        // Função para obter data atual no formato YYYY-MM-DD
         function getCurrentDate() {
             const now = new Date();
             return now.getFullYear() + '-' + 
@@ -724,14 +717,11 @@
                    String(now.getDate()).padStart(2, '0');
         }
 
-        // Carregar dados salvos na inicialização
         function loadSavedData() {
-            // Carregar dados do usuário
             const savedUserData = loadFromStorage('nutritrack_user_data');
             if (savedUserData) {
                 userData = savedUserData;
                 
-                // Preencher formulário
                 document.getElementById('name').value = userData.name || '';
                 document.getElementById('age').value = userData.age || '';
                 document.getElementById('gender').value = userData.gender || '';
@@ -740,17 +730,14 @@
                 document.getElementById('activity').value = userData.activity || '';
                 document.getElementById('goal').value = userData.goal || '';
 
-                // Se há dados salvos, recalcular automaticamente
                 if (userData.name && userData.age && userData.gender && userData.height && userData.weight && userData.activity && userData.goal) {
                     calculate();
                     showDataInfo();
                 }
             }
 
-            // Carregar dados de água do dia atual
             loadTodayWaterData();
             
-            // Carregar streak de água
             const savedStreak = loadFromStorage('nutritrack_water_streak');
             if (savedStreak) {
                 waterStreak = savedStreak;
@@ -758,7 +745,6 @@
             }
         }
 
-        // Carregar dados de água do dia atual
         function loadTodayWaterData() {
             const today = getCurrentDate();
             const todayWaterData = loadFromStorage(`nutritrack_water_${today}`);
@@ -767,7 +753,6 @@
                 waterConsumed = todayWaterData.consumed || 0;
                 waterGoal = todayWaterData.goal || 0;
                 
-                // Restaurar estado dos copos
                 if (todayWaterData.filledCups && Array.isArray(todayWaterData.filledCups)) {
                     setTimeout(() => {
                         todayWaterData.filledCups.forEach(index => {
@@ -782,7 +767,6 @@
             }
         }
 
-        // Salvar dados de água do dia atual
         function saveTodayWaterData() {
             const today = getCurrentDate();
             const filledCups = [];
@@ -802,7 +786,6 @@
             saveToStorage(`nutritrack_water_${today}`, waterData);
         }
 
-        // Mostrar informações sobre dados salvos
         function showDataInfo() {
             const savedData = loadFromStorage('nutritrack_user_data');
             if (savedData && savedData.lastUpdated) {
@@ -825,7 +808,6 @@
             }
         }
 
-       // Atualizar streak de água
         function updateWaterStreak() {
             const today = getCurrentDate();
             const yesterday = new Date();
@@ -837,22 +819,17 @@
             const todayWaterData = loadFromStorage(`nutritrack_water_${today}`);
             const yesterdayWaterData = loadFromStorage(`nutritrack_water_${yesterdayStr}`);
 
-            // Verificar se a meta de hoje foi atingida
             const todayGoalReached = todayWaterData && todayWaterData.consumed >= todayWaterData.goal;
             
-            // Verificar se a meta de ontem foi atingida
             const yesterdayGoalReached = yesterdayWaterData && yesterdayWaterData.consumed >= yesterdayWaterData.goal;
 
             if (todayGoalReached) {
                 if (yesterdayGoalReached) {
-                    // Continuar streak
                     waterStreak += 1;
                 } else {
-                    // Começar novo streak
                     waterStreak = 1;
                 }
             } else {
-                // Meta não atingida hoje, resetar streak
                 waterStreak = 0;
             }
 
@@ -860,7 +837,6 @@
             updateStreakDisplay();
         }
 
-        // Mostrar informações do streak
         function updateStreakDisplay() {
             const streakInfo = document.getElementById('streakInfo');
             const streakDays = document.getElementById('streakDays');
@@ -873,31 +849,23 @@
             }
         }
 
-        // Função para trocar abas
         function showTab(tabName) {
-            // Esconder todas as abas
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.remove('active'));
 
-            // Remover classe active de todos os botões
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
 
-            // Mostrar aba selecionada
             document.getElementById(tabName).classList.add('active');
 
-            // Adicionar classe active ao botão clicado
             event.target.classList.add('active');
 
-            // Se for a aba de água, atualizar display
             if (tabName === 'water') {
                 updateWaterProgress();
             }
         }
 
-        // Função principal de cálculo
         function calculate() {
-            // Coletar dados do formulário
             const name = document.getElementById('name').value;
             const age = parseFloat(document.getElementById('age').value);
             const gender = document.getElementById('gender').value;
@@ -906,20 +874,17 @@
             const activity = parseFloat(document.getElementById('activity').value);
             const goal = document.getElementById('goal').value;
 
-            // Validar dados
             if (!name || !age || !gender || !height || !weight || !activity || !goal) {
                 alert('Por favor, preencha todos os campos!');
                 return;
             }
 
-            // Salvar dados do usuário
             userData = {
                 name, age, gender, height, weight, activity, goal,
                 lastUpdated: new Date().toISOString()
             };
             saveToStorage('nutritrack_user_data', userData);
 
-            // Calcular TMB (Taxa Metabólica Basal)
             let tmb;
             if (gender === 'male') {
                 tmb = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
@@ -927,25 +892,23 @@
                 tmb = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
             }
 
-            // Calcular GET (Gasto Energético Total)
             const get = tmb * activity;
 
-            // Ajustar calorias baseado no objetivo
             let targetCalories;
             switch (goal) {
                 case 'lose':
-                    targetCalories = get - 500; // Déficit de 500 calorias
+                    targetCalories = get - 500; 
                     break;
                 case 'gain':
-                    targetCalories = get + 500; // Superávit de 500 calorias
+                    targetCalories = get + 500; 
                     break;
                 default:
-                    targetCalories = get; // Manutenção
+                    targetCalories = get; 
             }
 
             // Calcular macronutrientes
-            const protein = weight * 2; // 2g por kg
-            const fat = targetCalories * 0.25 / 9; // 25% das calorias
+            const protein = weight * 2; 
+            const fat = targetCalories * 0.25 / 9; 
             const carbs = (targetCalories - (protein * 4) - (fat * 9)) / 4;
 
             // Calcular IMC
@@ -958,22 +921,17 @@
             else if (bmi < 30) bmiCategory = 'Sobrepeso';
             else bmiCategory = 'Obesidade';
 
-            // Calcular meta de água
-            waterGoal = (weight * 35) / 1000; // 35ml por kg
+            waterGoal = (weight * 35) / 1000; 
 
-            // Exibir resultados
             displayResults(tmb, get, targetCalories, protein, fat, carbs, bmi, bmiCategory);
             
-            // Atualizar outras seções
             updateNutritionTab(targetCalories, protein, fat, carbs);
             updateScheduleTab();
             setupWaterTracker();
             
-            // Mostrar info dos dados salvos
             showDataInfo();
         }
 
-        // Exibir resultados dos cálculos
         function displayResults(tmb, get, targetCalories, protein, fat, carbs, bmi, bmiCategory) {
             const resultsDiv = document.getElementById('results');
             
@@ -1029,7 +987,6 @@
             `;
         }
 
-        // Atualizar aba de nutrição
         function updateNutritionTab(calories, protein, fat, carbs) {
             const nutritionContent = document.getElementById('nutritionContent');
             
@@ -1077,7 +1034,6 @@
             `;
         }
 
-        // Atualizar aba de horários
         function updateScheduleTab() {
             const scheduleContent = document.getElementById('scheduleContent');
             
@@ -1122,7 +1078,6 @@
             `;
         }
 
-        // Configurar controle de água
         function setupWaterTracker() {
             const waterCupsDiv = document.getElementById('waterCups');
             const cupsNeeded = Math.ceil(waterGoal / 0.25); // 250ml por copo
@@ -1139,12 +1094,9 @@
             
             updateWaterDisplay();
             updateWaterProgress();
-            
-            // Carregar estado dos copos salvos
             loadTodayWaterData();
         }
 
-        // Alternar estado do copo de água
         function toggleWaterCup(index) {
             const cup = document.getElementById(`cup-${index}`);
             const wasFilled = cup.classList.contains('filled');
@@ -1160,44 +1112,37 @@
             updateWaterProgress();
             saveTodayWaterData();
             
-            // Verificar se atingiu a meta
             if (waterConsumed >= waterGoal) {
                 updateWaterStreak();
             }
         }
 
-        // Atualizar exibição da água
         function updateWaterDisplay() {
             document.getElementById('dailyWaterGoal').textContent = waterGoal.toFixed(1);
             document.getElementById('waterTotal').textContent = waterGoal.toFixed(1);
         }
 
-        // Atualizar progresso da água
         function updateWaterProgress() {
             const progress = Math.min((waterConsumed / waterGoal) * 100, 100);
             document.getElementById('waterProgress').style.width = progress + '%';
             document.getElementById('waterConsumed').textContent = waterConsumed.toFixed(1);
         }
 
-        // Resetar controle de água
         function resetWaterTracker() {
             if (confirm('Tem certeza que deseja resetar o controle de água do dia?')) {
                 waterConsumed = 0;
                 
-                // Remover classe filled de todos os copos
                 document.querySelectorAll('.water-cup').forEach(cup => {
                     cup.classList.remove('filled');
                 });
                 
                 updateWaterProgress();
                 
-                // Remover dados salvos do dia atual
                 const today = getCurrentDate();
                 removeFromStorage(`nutritrack_water_${today}`);
             }
         }
 
-        // Limpar todos os dados
         function clearData() {
             if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
                 // Limpar formulário
@@ -1209,19 +1154,15 @@
                 document.getElementById('activity').value = '';
                 document.getElementById('goal').value = '';
                 
-                // Limpar resultados
                 document.getElementById('results').innerHTML = '';
                 document.getElementById('dataInfo').style.display = 'none';
                 
-                // Resetar conteúdo das abas
                 document.getElementById('nutritionContent').innerHTML = '<p style="text-align: center; color: #666;">Preencha o formulário na aba "Calc" primeiro</p>';
                 document.getElementById('scheduleContent').innerHTML = '<p style="text-align: center; color: #666;">Preencha o formulário na aba "Calc" primeiro</p>';
                 
-                // Limpar dados salvos
                 removeFromStorage('nutritrack_user_data');
                 removeFromStorage('nutritrack_water_streak');
                 
-                // Limpar todos os dados de água salvos (últimos 30 dias)
                 const today = new Date();
                 for (let i = 0; i < 30; i++) {
                     const date = new Date(today);
@@ -1232,13 +1173,11 @@
                     removeFromStorage(`nutritrack_water_${dateStr}`);
                 }
                 
-                // Resetar variáveis
                 userData = {};
                 waterConsumed = 0;
                 waterGoal = 0;
                 waterStreak = 0;
                 
-                // Limpar display de água
                 document.getElementById('waterCups').innerHTML = '';
                 document.getElementById('dailyWaterGoal').textContent = '0';
                 document.getElementById('waterConsumed').textContent = '0';
@@ -1250,17 +1189,14 @@
             }
         }
 
-        // Inicializar aplicação
         window.addEventListener('load', function() {
             loadSavedData();
             
-            // Configurar event listeners para salvar dados automaticamente
             const inputs = ['name', 'age', 'gender', 'height', 'weight', 'activity', 'goal'];
             inputs.forEach(inputId => {
                 const element = document.getElementById(inputId);
                 if (element) {
                     element.addEventListener('change', function() {
-                        // Salvar dados automaticamente quando houver mudanças
                         const currentData = {
                             name: document.getElementById('name').value,
                             age: document.getElementById('age').value,
@@ -1272,7 +1208,6 @@
                             lastUpdated: new Date().toISOString()
                         };
                         
-                        // Só salva se pelo menos nome estiver preenchido
                         if (currentData.name) {
                             saveToStorage('nutritrack_user_data', currentData);
                         }
@@ -1281,12 +1216,10 @@
             });
         });
 
-        // Função para verificar e limpar dados antigos (executar semanalmente)
         function cleanOldData() {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
             
-            // Limpar dados de água mais antigos que 30 dias
             for (let i = 30; i < 60; i++) {
                 const oldDate = new Date();
                 oldDate.setDate(oldDate.getDate() - i);
@@ -1297,7 +1230,6 @@
             }
         }
 
-        // Executar limpeza de dados antigos na inicialização (uma vez por semana)
         const lastCleanup = loadFromStorage('nutritrack_last_cleanup');
         const now = new Date();
         const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -1308,5 +1240,5 @@
         }
 		
 		</script>
-		</body>
+	</body>
 </html>
